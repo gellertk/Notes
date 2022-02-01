@@ -64,6 +64,10 @@ class NoteListTableViewCell: UITableViewCell {
     
     public func setupCell(_ note: Note, isFirst: Bool, isLast: Bool) {
         updateLabels(note)
+        setupCellCorners(isFirst: isFirst, isLast: isLast)
+    }
+    
+    public func setupCellCorners(isFirst: Bool, isLast: Bool) {
         if isFirst, isLast {
             layer.cornerRadius = 10
             layer.maskedCorners = [
@@ -89,6 +93,7 @@ class NoteListTableViewCell: UITableViewCell {
             createSeparatorLineView()
         }
     }
+    
     //TODO: fix to reusable cell
     private func createSeparatorLineView() {
         let separatorLineView = UIView()

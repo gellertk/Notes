@@ -9,12 +9,15 @@ import UIKit
 
 class NoteView: UIView {
     
+    let note: Note?
+    
     private lazy var noteTextView: UITextView = {
-       let textView = NoteTextView()
+       let textView = NoteTextView(note: note)
        return textView
     }()
     
-    init() {
+    init(note: Note?) {
+        self.note = note
         super.init(frame: CGRect.zero)
         setupView()
     }

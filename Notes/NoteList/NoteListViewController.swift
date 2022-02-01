@@ -9,7 +9,7 @@ import UIKit
 
 class NoteListViewController: UIViewController {
     
-    let notes = Note.getStoredNotes()
+    var notes = Note.getStoredNotes()
     
     private lazy var notesTableView: UITableView = {
         let tableView = NoteListTableView()
@@ -22,6 +22,11 @@ class NoteListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        setupNavigationController()
     }
     
     private func setupView() {
@@ -45,7 +50,6 @@ class NoteListViewController: UIViewController {
         navigationController.navigationBar.barStyle = .black
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "plus"), style: .plain, target: self, action: #selector(didTapAddButton))
         navigationItem.rightBarButtonItem?.tintColor = .systemOrange
-
         navigationController.navigationBar.prefersLargeTitles = true
     }
     
@@ -77,7 +81,7 @@ extension NoteListViewController: UITableViewDelegate, UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: Note.Constants.cellId, for: indexPath) as? NoteListTableViewCell else {
             return UITableViewCell()
         }
-
+        
         cell.setupCell(notes[indexPath.row],
                        isFirst: indexPath.row == 0,
                        isLast: indexPath.row == (notes.count - 1))
@@ -86,6 +90,40 @@ extension NoteListViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 75.0
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard let navigationController = navigationController else {
+            return
+        }
+        notesTableView.deselectRow(at: indexPath, animated: true)
+        navigationController.pushViewController(NoteViewController(note: notes[indexPath.row]), animated: true)
+    }
+    
+    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        return .delete
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            tableView.beginUpdates()
+            notes.remove(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath], with: .fade)
+            tableView.endUpdates()
+        }
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: Note.Constants.cellId, for: indexPath) as? NoteListTableViewCell else {
+            return
+        }
+        cell.setupCellCorners(isFirst: indexPath.row == 0,
+                       isLast: indexPath.row == (notes.count - 1))
+    }
+    
+    func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: Note.Constants.cellId, for: indexPath) as? NoteListTableViewCell else {
+            return
+        }
+        cell.setupCellCorners(isFirst: indexPath.row == 0,
+                       isLast: indexPath.row == (notes.count - 1))
     }
     
 }
