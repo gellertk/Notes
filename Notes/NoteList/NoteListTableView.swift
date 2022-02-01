@@ -26,12 +26,8 @@ class NoteListTableView: UITableView {
     }
     
     private func setupView() {
-        backgroundColor = .gray
-        setupConstraints()
-    }
-    
-    private func setupConstraints() {
-        
+        separatorStyle = .none
+        backgroundColor = .black.withAlphaComponent(0.1)
     }
 
     required init?(coder: NSCoder) {

@@ -50,7 +50,10 @@ class NoteListViewController: UIViewController {
     }
     
     @objc private func didTapAddButton() {
-  
+        guard let navigationController = navigationController else {
+            return
+        }
+        navigationController.pushViewController(NoteViewController(), animated: true)
     }
     
     private func setupConstraints() {
@@ -75,14 +78,16 @@ extension NoteListViewController: UITableViewDelegate, UITableViewDataSource {
             return UITableViewCell()
         }
 
-        cell.updateLabels(notes[indexPath.row])
-
+        cell.setupCell(notes[indexPath.row],
+                       isFirst: indexPath.row == 0,
+                       isLast: indexPath.row == (notes.count - 1))
         return cell
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 60.0
+        return 75.0
     }
+    
 }
 
 

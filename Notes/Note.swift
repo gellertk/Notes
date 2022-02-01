@@ -34,7 +34,12 @@ struct Note {
     
     public static func getStoredNotes() -> [Note] {
         return [
-            Note(title: "Welcome", text: "This is the first note", date: Date())
+            Note(title: "Welcome", text: "This is the first note", date: Date()),
+            Note(title: "Welcome", text: "This is the first note", date: Date()),
+            Note(title: "Welcome", text: "This is the first note", date: Date()),
+            Note(title: "Welcome", text: "This is the first note", date: Date()),
+            Note(title: "Welcome", text: "This is the first note", date: Date()),
+
         ]
     }
     

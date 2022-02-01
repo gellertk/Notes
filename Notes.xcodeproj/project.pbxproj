@@ -13,10 +13,13 @@
 		CB5FA96227A71FF5007DA54B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CB5FA96127A71FF5007DA54B /* Assets.xcassets */; };
 		CB5FA96527A71FF5007DA54B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CB5FA96327A71FF5007DA54B /* LaunchScreen.storyboard */; };
 		CB6CA4AD27A84B7D00788135 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB6CA4AC27A84B7D00788135 /* Note.swift */; };
-		CB6CA4B127A871FA00788135 /* NoteListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB6CA4B027A871FA00788135 /* NoteListView.swift */; };
 		CB6CA4B327A884E400788135 /* NoteListTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB6CA4B227A884E400788135 /* NoteListTitleView.swift */; };
 		CB6CA4B527A8891800788135 /* NoteListTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB6CA4B427A8891800788135 /* NoteListTableView.swift */; };
 		CB6CA4B727A88CE200788135 /* NoteListTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB6CA4B627A88CE200788135 /* NoteListTableViewCell.swift */; };
+		CB6CA4BA27A9536D00788135 /* DateExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB6CA4B927A9536D00788135 /* DateExtensions.swift */; };
+		CB6CA4C127A9934400788135 /* NoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB6CA4C027A9934400788135 /* NoteView.swift */; };
+		CB6CA4C327A994ED00788135 /* NoteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB6CA4C227A994ED00788135 /* NoteViewController.swift */; };
+		CB6CA4C527A9B84600788135 /* NoteTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB6CA4C427A9B84600788135 /* NoteTextView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,10 +31,13 @@
 		CB5FA96427A71FF5007DA54B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		CB5FA96627A71FF5007DA54B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CB6CA4AC27A84B7D00788135 /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
-		CB6CA4B027A871FA00788135 /* NoteListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteListView.swift; sourceTree = "<group>"; };
 		CB6CA4B227A884E400788135 /* NoteListTitleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteListTitleView.swift; sourceTree = "<group>"; };
 		CB6CA4B427A8891800788135 /* NoteListTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteListTableView.swift; sourceTree = "<group>"; };
 		CB6CA4B627A88CE200788135 /* NoteListTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteListTableViewCell.swift; sourceTree = "<group>"; };
+		CB6CA4B927A9536D00788135 /* DateExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateExtensions.swift; sourceTree = "<group>"; };
+		CB6CA4C027A9934400788135 /* NoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteView.swift; sourceTree = "<group>"; };
+		CB6CA4C227A994ED00788135 /* NoteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteViewController.swift; sourceTree = "<group>"; };
+		CB6CA4C427A9B84600788135 /* NoteTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTextView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -48,6 +54,7 @@
 		CB5FA94C27A71FF1007DA54B = {
 			isa = PBXGroup;
 			children = (
+				CB6CA4B827A9534F00788135 /* Extensions */,
 				CB5FA95727A71FF1007DA54B /* Notes */,
 				CB5FA95627A71FF1007DA54B /* Products */,
 			);
@@ -66,6 +73,7 @@
 			children = (
 				CB6CA4AC27A84B7D00788135 /* Note.swift */,
 				CB6CA4AA27A8433500788135 /* NoteList */,
+				CB6CA4BD27A992C400788135 /* Note */,
 				CB6CA4AB27A8435A00788135 /* SupportingFiles */,
 				CB5FA96127A71FF5007DA54B /* Assets.xcassets */,
 				CB5FA96327A71FF5007DA54B /* LaunchScreen.storyboard */,
@@ -80,7 +88,6 @@
 				CB5FA95C27A71FF1007DA54B /* NoteListViewController.swift */,
 				CB6CA4B627A88CE200788135 /* NoteListTableViewCell.swift */,
 				CB6CA4B427A8891800788135 /* NoteListTableView.swift */,
-				CB6CA4B027A871FA00788135 /* NoteListView.swift */,
 				CB6CA4B227A884E400788135 /* NoteListTitleView.swift */,
 			);
 			path = NoteList;
@@ -93,6 +100,24 @@
 				CB5FA95A27A71FF1007DA54B /* SceneDelegate.swift */,
 			);
 			path = SupportingFiles;
+			sourceTree = "<group>";
+		};
+		CB6CA4B827A9534F00788135 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				CB6CA4B927A9536D00788135 /* DateExtensions.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		CB6CA4BD27A992C400788135 /* Note */ = {
+			isa = PBXGroup;
+			children = (
+				CB6CA4C227A994ED00788135 /* NoteViewController.swift */,
+				CB6CA4C427A9B84600788135 /* NoteTextView.swift */,
+				CB6CA4C027A9934400788135 /* NoteView.swift */,
+			);
+			path = Note;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -167,12 +192,15 @@
 			files = (
 				CB6CA4AD27A84B7D00788135 /* Note.swift in Sources */,
 				CB5FA95D27A71FF1007DA54B /* NoteListViewController.swift in Sources */,
-				CB6CA4B127A871FA00788135 /* NoteListView.swift in Sources */,
 				CB6CA4B727A88CE200788135 /* NoteListTableViewCell.swift in Sources */,
 				CB5FA95927A71FF1007DA54B /* AppDelegate.swift in Sources */,
 				CB5FA95B27A71FF1007DA54B /* SceneDelegate.swift in Sources */,
 				CB6CA4B327A884E400788135 /* NoteListTitleView.swift in Sources */,
+				CB6CA4BA27A9536D00788135 /* DateExtensions.swift in Sources */,
 				CB6CA4B527A8891800788135 /* NoteListTableView.swift in Sources */,
+				CB6CA4C327A994ED00788135 /* NoteViewController.swift in Sources */,
+				CB6CA4C527A9B84600788135 /* NoteTextView.swift in Sources */,
+				CB6CA4C127A9934400788135 /* NoteView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
