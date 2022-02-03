@@ -7,21 +7,24 @@
 
 import UIKit
 
+public var noteList: [Note] = []
+
 class NoteListViewController: UIViewController {
     
-    var notes = Note.getStoredNotes()
+    private static let noteTitle = "Заметки"
     
     private lazy var notesTableView: UITableView = {
         let tableView = NoteListTableView()
         tableView.delegate = self
         tableView.dataSource = self
-        tableView.register(NoteListTableViewCell.self, forCellReuseIdentifier: Note.Constants.cellId)
         return tableView
     }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
+        setupNavigationController()
+        getNotesFromStorage()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -29,8 +32,16 @@ class NoteListViewController: UIViewController {
         setupNavigationController()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        notesTableView.reloadData()
+    }
+    
+    private func getNotesFromStorage() {
+        noteList = CoreDataManager.shared.getNotes()
+        //notesTableView.reloadData()
+    }
+    
     private func setupView() {
-        setupNavigationController()
         view.backgroundColor = .black
         [notesTableView].forEach { newView in
             newView.translatesAutoresizingMaskIntoConstraints = false
@@ -43,12 +54,15 @@ class NoteListViewController: UIViewController {
         guard let navigationController = navigationController else {
             return
         }
-        title = Note.Constants.noteTitle
+        title = NoteListViewController.noteTitle
         navigationController.navigationBar.titleTextAttributes = [
             NSAttributedString.Key.foregroundColor: UIColor.white
         ]
         navigationController.navigationBar.barStyle = .black
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "plus"), style: .plain, target: self, action: #selector(didTapAddButton))
+        navigationItem.setRightBarButton(UIBarButtonItem(image: UIImage(systemName: "plus"),
+                                                         style: .plain,
+                                                         target: self,
+                                                         action: #selector(didTapAddButton)), animated: false)
         navigationItem.rightBarButtonItem?.tintColor = .systemOrange
         navigationController.navigationBar.prefersLargeTitles = true
     }
@@ -57,7 +71,15 @@ class NoteListViewController: UIViewController {
         guard let navigationController = navigationController else {
             return
         }
+        createNote()
         navigationController.pushViewController(NoteViewController(), animated: true)
+    }
+    
+    private func createNote() -> Note {
+        let note = CoreDataManager.shared.createNote()
+        noteList.insert(note, at: 0)
+        notesTableView.insertRows(at: [IndexPath(row: 0, section: 0)], with: .automatic)
+        return note
     }
     
     private func setupConstraints() {
@@ -74,22 +96,22 @@ class NoteListViewController: UIViewController {
 extension NoteListViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return notes.count
+        return noteList.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: Note.Constants.cellId, for: indexPath) as? NoteListTableViewCell else {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: NoteListTableViewCell.cellId,
+                                                       for: indexPath) as? NoteListTableViewCell else {
             return UITableViewCell()
         }
-        
-        cell.setupCell(notes[indexPath.row],
-                       isFirst: indexPath.row == 0,
-                       isLast: indexPath.row == (notes.count - 1))
+        cell.setup(noteList[indexPath.row],
+                   isFirst: indexPath.row == 0,
+                   isLast: indexPath.row == (noteList.count - 1))
         return cell
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 75.0
+        return NoteListTableViewCell.cellHeight
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -97,35 +119,26 @@ extension NoteListViewController: UITableViewDelegate, UITableViewDataSource {
             return
         }
         notesTableView.deselectRow(at: indexPath, animated: true)
-        navigationController.pushViewController(NoteViewController(note: notes[indexPath.row]), animated: true)
+        navigationController.pushViewController(NoteViewController(note: noteList[indexPath.row]), animated: true)
     }
     
     func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
         return .delete
     }
     
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+    func tableView(_ tableView: UITableView,
+                   commit editingStyle: UITableViewCell.EditingStyle,
+                   forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            tableView.beginUpdates()
-            notes.remove(at: indexPath.row)
+            noteList.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .fade)
-            tableView.endUpdates()
         }
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: Note.Constants.cellId, for: indexPath) as? NoteListTableViewCell else {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: NoteListTableViewCell.cellId,
+                                                       for: indexPath) as? NoteListTableViewCell else {
             return
         }
-        cell.setupCellCorners(isFirst: indexPath.row == 0,
-                       isLast: indexPath.row == (notes.count - 1))
-    }
-    
-    func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: Note.Constants.cellId, for: indexPath) as? NoteListTableViewCell else {
-            return
-        }
-        cell.setupCellCorners(isFirst: indexPath.row == 0,
-                       isLast: indexPath.row == (notes.count - 1))
+        cell.setupCorners(isFirst: indexPath.row == 0,
+                              isLast: indexPath.row == (noteList.count - 1))
     }
     
 }
-
-

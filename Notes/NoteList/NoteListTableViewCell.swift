@@ -9,6 +9,9 @@ import UIKit
 
 class NoteListTableViewCell: UITableViewCell {
     
+    public static let cellHeight = CGFloat(75)
+    public static let cellId = "cellId"
+    
     private lazy var titleCellLabel: UILabel = {
         let label = UILabel()
         label.textColor = .white
@@ -23,12 +26,15 @@ class NoteListTableViewCell: UITableViewCell {
         return label
     }()
     
-    override func awakeFromNib() {
-        super.awakeFromNib()
-    }
+    private lazy var separatorLineView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .lightGray.withAlphaComponent(0.1)
+        return view
+    }()
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        selectionStyle = .none
         setupView()
     }
     
@@ -38,7 +44,7 @@ class NoteListTableViewCell: UITableViewCell {
     
     private func setupView() {
         backgroundColor = UIColor(white: 0.1, alpha: 1)
-        [titleCellLabel, textCellLabel].forEach { view in
+        [titleCellLabel, textCellLabel, separatorLineView].forEach { view in
             view.translatesAutoresizingMaskIntoConstraints = false
             addSubview(view)
         }
@@ -53,21 +59,26 @@ class NoteListTableViewCell: UITableViewCell {
             
             textCellLabel.leadingAnchor.constraint(equalTo: titleCellLabel.leadingAnchor),
             textCellLabel.topAnchor.constraint(equalTo: titleCellLabel.bottomAnchor, constant: 5),
-            textCellLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20)
+            textCellLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
+            
+            separatorLineView.heightAnchor.constraint(equalToConstant: 1),
+            separatorLineView.topAnchor.constraint(equalTo: topAnchor),
+            separatorLineView.leadingAnchor.constraint(equalTo: titleCellLabel.leadingAnchor),
+            separatorLineView.trailingAnchor.constraint(equalTo: trailingAnchor)
         ])
     }
     
     private func updateLabels(_ note: Note) {
-        titleCellLabel.text = note.title
-        textCellLabel.text = "\(note.date.convertToHumanReadableFormat()) \(note.text)"
+        titleCellLabel.text = "\(note.title)"
+        textCellLabel.text = "\(note.lastUpdated.convertToHumanReadableFormat()) \(note.text)"
     }
     
-    public func setupCell(_ note: Note, isFirst: Bool, isLast: Bool) {
+    public func setup(_ note: Note, isFirst: Bool, isLast: Bool) {
         updateLabels(note)
-        setupCellCorners(isFirst: isFirst, isLast: isLast)
+        setupCorners(isFirst: isFirst, isLast: isLast)
     }
     
-    public func setupCellCorners(isFirst: Bool, isLast: Bool) {
+    public func setupCorners(isFirst: Bool, isLast: Bool) {
         if isFirst, isLast {
             layer.cornerRadius = 10
             layer.maskedCorners = [
@@ -76,38 +87,25 @@ class NoteListTableViewCell: UITableViewCell {
                 .layerMinXMaxYCorner,
                 .layerMaxXMaxYCorner
             ]
+            separatorLineView.isHidden = true
         } else if isFirst {
             layer.cornerRadius = 10
             layer.maskedCorners = [
                 .layerMinXMinYCorner,
                 .layerMaxXMinYCorner,
             ]
+            separatorLineView.isHidden = true
         } else if isLast {
-            createSeparatorLineView()
             layer.cornerRadius = 10
             layer.maskedCorners = [
                 .layerMinXMaxYCorner,
                 .layerMaxXMaxYCorner
             ]
         } else {
-            createSeparatorLineView()
+            separatorLineView.isHidden = false
         }
     }
-    
-    //TODO: fix to reusable cell
-    private func createSeparatorLineView() {
-        let separatorLineView = UIView()
-        addSubview(separatorLineView)
-        separatorLineView.translatesAutoresizingMaskIntoConstraints = false
-        separatorLineView.backgroundColor = .lightGray.withAlphaComponent(0.1)
-        NSLayoutConstraint.activate([
-            separatorLineView.heightAnchor.constraint(equalToConstant: 1),
-            separatorLineView.topAnchor.constraint(equalTo: topAnchor),
-            separatorLineView.leadingAnchor.constraint(equalTo: titleCellLabel.leadingAnchor),
-            separatorLineView.trailingAnchor.constraint(equalTo: trailingAnchor)
-        ])
-    }
-    
+
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
         

@@ -7,42 +7,81 @@
 
 import UIKit
 
-class NoteTextView: UITextView {
-    
-    let note: Note?
+protocol NoteTextViewDelegate: UITextViewDelegate {
+    func didKeyboardShownOrHiden()
+    //func didTextChange(title: String, text: String)
+}
 
+class NoteTextView: UITextView {
+        
+    static let contentInset = UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
+        
+    private let note: Note?
+    private var isKeyboardShown = false
+    
+    public weak var noteViewControllerDelegate: NoteTextViewDelegate?
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     init(note: Note?) {
         self.note = note
-        super.init(frame: CGRect(x: 0, y: 0, width: 250.0, height: 150.0),
-                   textContainer: nil)
+        super.init(frame: CGRect.zero, textContainer: nil)
         setupView()
+        addObservers()
+    }
+    
+    private func addObservers() {
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(didKeyboardShowOrHide(notification:)),
+                                               name: UIResponder.keyboardWillShowNotification,
+                                               object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(didKeyboardShowOrHide(notification:)),
+                                               name: UIResponder.keyboardWillHideNotification,
+                                               object: nil)
     }
     
     private func setupView() {
-        //backgroundColor = .white
+        font = UIFont.preferredFont(forTextStyle: .body)
         backgroundColor = .black.withAlphaComponent(0.1)
-        contentInset = UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
         textColor = .white
-        setupNote()
-        setupConstraints()
+        contentInset = NoteTextView.contentInset
+        setupText()
     }
     
-    private func setupNote() {
+    @objc private func didKeyboardShowOrHide(notification: Notification) {
+        guard let keyboardValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue,
+              let noteViewControllerDelegate = noteViewControllerDelegate else {
+            return
+        }
+        let keyboardViewEndFrame = convert(keyboardValue.cgRectValue, to: window)
+        if notification.name == UIResponder.keyboardWillHideNotification, isKeyboardShown {
+            noteViewControllerDelegate.didKeyboardShownOrHiden()
+            isKeyboardShown = false
+        } else if notification.name == UIResponder.keyboardWillShowNotification, !isKeyboardShown {
+            contentInset = UIEdgeInsets(top: 5,
+                                        left: 5,
+                                        bottom: keyboardViewEndFrame.height - safeAreaInsets.bottom,
+                                        right: 5)
+            noteViewControllerDelegate.didKeyboardShownOrHiden()
+            isKeyboardShown = true
+        }
+    }
+    
+    private func setupText() {
         guard let note = note else {
             return
         }
         text = """
-        \(note.title)
-        \(note.text)
+        \(String(describing: note.title))
+        \(String(describing: note.text))
         """
     }
     
-    private func setupConstraints() {
-        
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
-
+    
 }

@@ -8,13 +8,7 @@
 import UIKit
 
 class NoteListTableView: UITableView {
-    
-    private lazy var notesTableView: UITableView = {
-        let tableView = UITableView()
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: Note.Constants.cellId)
-        return tableView
-    }()
-    
+        
     private lazy var searchBar: UISearchBar = {
         let searchBar = UISearchBar()
         return searchBar
@@ -22,10 +16,11 @@ class NoteListTableView: UITableView {
     
     init() {
         super.init(frame: CGRect.zero, style: .plain)
-        setupView()
+        setupTableView()
     }
     
-    private func setupView() {
+    private func setupTableView() {
+        register(NoteListTableViewCell.self, forCellReuseIdentifier: NoteListTableViewCell.cellId)
         separatorStyle = .none
         backgroundColor = .black.withAlphaComponent(0.1)
     }
