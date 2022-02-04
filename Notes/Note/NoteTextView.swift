@@ -9,8 +9,11 @@ import UIKit
 
 protocol NoteTextViewDelegate: UITextViewDelegate {
     func didKeyboardShownOrHiden()
-    //func didTextChange(title: String, text: String)
 }
+
+//extension UITextViewDelegate {
+//    func didKeyboardShownOrHiden()
+//}
 
 class NoteTextView: UITextView {
         
@@ -18,7 +21,7 @@ class NoteTextView: UITextView {
         
     private let note: Note?
     private var isKeyboardShown = false
-    
+        
     public weak var noteViewControllerDelegate: NoteTextViewDelegate?
     
     required init?(coder: NSCoder) {
@@ -45,10 +48,17 @@ class NoteTextView: UITextView {
     
     private func setupView() {
         font = UIFont.preferredFont(forTextStyle: .body)
-        backgroundColor = .black.withAlphaComponent(0.1)
+        backgroundColor = .black
         textColor = .white
         contentInset = NoteTextView.contentInset
         setupText()
+    }
+    
+    private func setupText() {
+        guard let note = note else {
+            return
+        }
+        text = "\(note.text ?? "")"
     }
     
     @objc private func didKeyboardShowOrHide(notification: Notification) {
@@ -68,16 +78,6 @@ class NoteTextView: UITextView {
             noteViewControllerDelegate.didKeyboardShownOrHiden()
             isKeyboardShown = true
         }
-    }
-    
-    private func setupText() {
-        guard let note = note else {
-            return
-        }
-        text = """
-        \(String(describing: note.title))
-        \(String(describing: note.text))
-        """
     }
     
     deinit {

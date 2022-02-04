@@ -10,12 +10,12 @@ import CoreData
 
 class NoteViewController: UIViewController {
     
-    static let buttonsColor = UIColor.systemYellow
-    
-    private var selectedNote: Note?
+    private let buttonsColor = UIColor.systemYellow
+    private var note: Note?
+    public weak var noteListViewControllerDelegate: NoteListViewControllerDelegate?
     
     init(note: Note? = nil) {
-        self.selectedNote = note
+        self.note = note
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -24,8 +24,9 @@ class NoteViewController: UIViewController {
     }
     
     private lazy var noteTextView: NoteTextView = {
-        let noteView = NoteTextView(note: selectedNote)
+        let noteView = NoteTextView(note: note)
         noteView.noteViewControllerDelegate = self
+        noteView.delegate = self
         noteView.translatesAutoresizingMaskIntoConstraints = false
         return noteView
     }()
@@ -33,20 +34,30 @@ class NoteViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
-    }
-    
-    private func setupView() {
-        view.addSubview(noteTextView)
-        setupConstraints()
         setupNavigationBar()
     }
     
-    private func setupNavigationBar() {
-        guard let navigationController = navigationController else {
-            return
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if noteTextView.text.isEmpty {
+            noteTextView.becomeFirstResponder()
         }
-        navigationController.navigationBar.tintColor = NoteViewController.buttonsColor
-        navigationController.navigationBar.prefersLargeTitles = false
+    }
+    
+    private func setupNavigationBar() {
+        let apperance = UINavigationBarAppearance()
+        apperance.backgroundColor = .black
+        navigationController?.navigationBar.backgroundColor = .black
+        navigationController?.navigationBar.tintColor = buttonsColor
+        navigationController?.view.backgroundColor = .black
+        navigationItem.scrollEdgeAppearance = apperance
+        navigationItem.standardAppearance = apperance
+    }
+    
+    private func setupView() {
+        view.backgroundColor = .black
+        view.addSubview(noteTextView)
+        setupConstraints()
     }
     
     private func setupConstraints() {
@@ -58,8 +69,17 @@ class NoteViewController: UIViewController {
         ])
     }
     
+    private func updateNote() {
+        note?.lastUpdated = Date()
+        CoreDataManager.shared.save()
+        noteListViewControllerDelegate?.refreshNoteList()
+    }
+    
     private func deleteNote() {
-      
+        guard let note = note else {
+            return
+        }
+        noteListViewControllerDelegate?.deleteNote(note: note)
     }
     
 }
@@ -81,21 +101,23 @@ extension NoteViewController: NoteTextViewDelegate {
                 NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17, weight: .semibold)
             ], for: .normal)
             navigationItem.setRightBarButton(doneButton, animated: false)
-            navigationItem.rightBarButtonItem?.tintColor = NoteViewController.buttonsColor
+            navigationItem.rightBarButtonItem?.tintColor = buttonsColor
         } else {
             navigationItem.rightBarButtonItem = nil
         }
     }
     
-    private func saveNote() {
-        
-    }
-    
-    public func didAction(text: String) {
-        selectedNote?.text = text
-    }
+}
+
+extension NoteViewController: UITextViewDelegate {
     
     func textViewDidEndEditing(_ textView: UITextView) {
-        print("text did editing")
+        note?.text = textView.text
+        if note?.text.isEmpty ?? true {
+            deleteNote()
+        } else {
+            updateNote()
+        }
     }
+        
 }

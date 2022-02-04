@@ -10,10 +10,14 @@ import Foundation
 extension Date {
     
     func convertToHumanReadableFormat() -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "dd.MM.YYYY"
-        dateFormatter.locale = Locale(identifier: "ru_RU")
-        return dateFormatter.string(from: self)
+        let formatter = DateFormatter()
+        if Calendar.current.isDateInToday(self) {
+            formatter.dateFormat = "hh:mm"
+        } else {
+            formatter.dateFormat = "dd.mm.yyyy"
+        }
+        formatter.locale = Locale(identifier: "ru_RU")
+        return formatter.string(from: self)
     }
-
+    
 }

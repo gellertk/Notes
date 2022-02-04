@@ -70,7 +70,7 @@ class NoteListTableViewCell: UITableViewCell {
     
     private func updateLabels(_ note: Note) {
         titleCellLabel.text = "\(note.title)"
-        textCellLabel.text = "\(note.lastUpdated.convertToHumanReadableFormat()) \(note.text)"
+        textCellLabel.text = "\(note.desc)"
     }
     
     public func setup(_ note: Note, isFirst: Bool, isLast: Bool) {
@@ -102,13 +102,9 @@ class NoteListTableViewCell: UITableViewCell {
                 .layerMaxXMaxYCorner
             ]
         } else {
+            layer.cornerRadius = 0
             separatorLineView.isHidden = false
         }
-    }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-        
     }
     
 }

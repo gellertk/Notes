@@ -16,4 +16,12 @@ public class Note: NSManagedObject {
         return text.trimmingCharacters(in: .whitespacesAndNewlines).components(separatedBy: .newlines).first ?? ""
     }
     
+    var desc: String {
+        var lines = text.trimmingCharacters(in: .whitespacesAndNewlines).components(separatedBy: .newlines).filter { $0 != "" }
+        if lines.count > 0 {
+            lines.removeFirst()
+        }
+        return "\(lastUpdated.convertToHumanReadableFormat()) \(lines.first ?? "Нет дополнительного текста")"
+    }
+    
 }

@@ -20,6 +20,8 @@ class NoteListTableView: UITableView {
     }
     
     private func setupTableView() {
+        layer.cornerRadius = 10
+        layer.masksToBounds = true
         register(NoteListTableViewCell.self, forCellReuseIdentifier: NoteListTableViewCell.cellId)
         separatorStyle = .none
         backgroundColor = .black.withAlphaComponent(0.1)
