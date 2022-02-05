@@ -29,9 +29,13 @@ class NoteListViewController: UIViewController {
     }()
     
     private lazy var noteListTableView: UITableView = {
-        let tableView = NoteListTableView()
+        let tableView = UITableView()
         tableView.delegate = self
         tableView.dataSource = self
+        tableView.layer.cornerRadius = 10
+        tableView.register(NoteListTableViewCell.self, forCellReuseIdentifier: NoteListTableViewCell.cellId)
+        tableView.separatorStyle = .none
+        tableView.backgroundColor = .black.withAlphaComponent(0.1)
         return tableView
     }()
     
