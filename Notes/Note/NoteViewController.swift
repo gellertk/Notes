@@ -34,7 +34,6 @@ class NoteViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
-        setupNavigationBar()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -42,20 +41,16 @@ class NoteViewController: UIViewController {
         if noteTextView.text.isEmpty {
             noteTextView.becomeFirstResponder()
         }
+        navigationController?.navigationBar.prefersLargeTitles = false
     }
     
-    private func setupNavigationBar() {
-        let apperance = UINavigationBarAppearance()
-        apperance.backgroundColor = .black
-        navigationController?.navigationBar.backgroundColor = .black
-        navigationController?.navigationBar.tintColor = buttonsColor
-        navigationController?.view.backgroundColor = .black
-        navigationItem.scrollEdgeAppearance = apperance
-        navigationItem.standardAppearance = apperance
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.navigationBar.prefersLargeTitles = true
     }
     
     private func setupView() {
-        view.backgroundColor = .black
+        view.backgroundColor = .blue
         view.addSubview(noteTextView)
         setupConstraints()
     }
@@ -82,13 +77,13 @@ class NoteViewController: UIViewController {
         noteListViewControllerDelegate?.deleteNote(note: note)
     }
     
-}
-
-extension NoteViewController: NoteTextViewDelegate {
-    
     @objc private func didTapDoneButton() {
         noteTextView.resignFirstResponder()
     }
+    
+}
+
+extension NoteViewController: NoteTextViewDelegate {
     
     @objc func didKeyboardShownOrHiden() {
         if navigationItem.rightBarButtonItem == nil {

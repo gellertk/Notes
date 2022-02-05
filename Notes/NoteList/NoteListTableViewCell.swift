@@ -9,7 +9,6 @@ import UIKit
 
 class NoteListTableViewCell: UITableViewCell {
     
-    public static let cellHeight = CGFloat(75)
     public static let cellId = "cellId"
     
     private lazy var titleCellLabel: UILabel = {

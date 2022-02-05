@@ -9,11 +9,6 @@ import UIKit
 
 class NoteListTableView: UITableView {
         
-    private lazy var searchBar: UISearchBar = {
-        let searchBar = UISearchBar()
-        return searchBar
-    }()
-    
     init() {
         super.init(frame: CGRect.zero, style: .plain)
         setupTableView()
@@ -21,7 +16,6 @@ class NoteListTableView: UITableView {
     
     private func setupTableView() {
         layer.cornerRadius = 10
-        layer.masksToBounds = true
         register(NoteListTableViewCell.self, forCellReuseIdentifier: NoteListTableViewCell.cellId)
         separatorStyle = .none
         backgroundColor = .black.withAlphaComponent(0.1)

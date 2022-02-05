@@ -14,9 +14,19 @@ protocol NoteListViewControllerDelegate: AnyObject {
 
 class NoteListViewController: UIViewController {
     
+    private static let noteTitle = "Заметки"
+    
+    private let buttonsColor = UIColor.systemYellow
+    
     private var noteList: [Note] = []
     
-    private static let noteTitle = "Заметки"
+    private lazy var searchController: UISearchController = {
+        let searchController = UISearchController()
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.searchBar.delegate = self
+        searchController.delegate = self
+        return searchController
+    }()
     
     private lazy var noteListTableView: UITableView = {
         let tableView = NoteListTableView()
@@ -27,9 +37,8 @@ class NoteListViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupView()
-        setupNavigationBar()
         fillNotes()
+        setupView()
     }
     
     private func fillNotes() {
@@ -45,6 +54,8 @@ class NoteListViewController: UIViewController {
     }
     
     private func setupView() {
+        setupNavigationBar()
+        navigationItem.searchController = searchController
         view.backgroundColor = .black
         [noteListTableView].forEach { newView in
             newView.translatesAutoresizingMaskIntoConstraints = false
@@ -58,16 +69,14 @@ class NoteListViewController: UIViewController {
             return
         }
         title = NoteListViewController.noteTitle
-        navigationController.navigationBar.titleTextAttributes = [
-            NSAttributedString.Key.foregroundColor: UIColor.white
-        ]
         navigationController.navigationBar.barStyle = .black
+        navigationController.navigationBar.prefersLargeTitles = true
+        navigationController.navigationBar.tintColor = buttonsColor
+        navigationController.navigationBar.isTranslucent = false
         navigationItem.setRightBarButton(UIBarButtonItem(image: UIImage(systemName: "plus"),
                                                          style: .plain,
                                                          target: self,
                                                          action: #selector(didTapAddButton)), animated: false)
-        navigationItem.rightBarButtonItem?.tintColor = .systemOrange
-        navigationController.navigationBar.prefersLargeTitles = true
     }
     
     @objc private func didTapAddButton() {
@@ -94,9 +103,18 @@ class NoteListViewController: UIViewController {
         NSLayoutConstraint.activate([
             noteListTableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             noteListTableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            noteListTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 5),
-            noteListTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -5)
+            noteListTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 15),
+            noteListTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -15)
         ])
+    }
+    
+    private func indexForNote(note: Note, in list: [Note]) -> IndexPath {
+        let row = Int(list.firstIndex(where: { $0 == note }) ?? 0)
+        return IndexPath(row: row, section: 0)
+    }
+    
+    @objc public func reloadTable() {
+        noteListTableView.reloadData()
     }
     
 }
@@ -119,29 +137,20 @@ extension NoteListViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return NoteListTableViewCell.cellHeight
+        return 75
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         noteListTableView.deselectRow(at: indexPath, animated: true)
         toNoteViewController(note: noteList[indexPath.row])
     }
-
+    
     func tableView(_ tableView: UITableView,
                    commit editingStyle: UITableViewCell.EditingStyle,
                    forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             deleteNote(note: noteList[indexPath.row])
         }
-    }
-    
-    private func indexForNote(note: Note, in list: [Note]) -> IndexPath {
-        let row = Int(list.firstIndex(where: { $0 == note }) ?? 0)
-        return IndexPath(row: row, section: 0)
-    }
-    
-    @objc public func reloadTable() {
-        noteListTableView.reloadData()
     }
     
 }
@@ -158,6 +167,28 @@ extension NoteListViewController: NoteListViewControllerDelegate {
     func refreshNoteList() {
         noteList = noteList.sorted { $0.lastUpdated > $1.lastUpdated }
         noteListTableView.reloadData()
+    }
+    
+    func search(_ text: String?) {
+        noteList = CoreDataManager.shared.getNotes(filter: text)
+        noteListTableView.reloadData()
+    }
+    
+}
+
+extension NoteListViewController: UISearchControllerDelegate, UISearchBarDelegate {
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        let text = searchText == "" ? nil : searchText
+        search(text)
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        search(nil)
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        search(searchBar.text)
     }
     
 }

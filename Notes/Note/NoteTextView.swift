@@ -11,10 +11,6 @@ protocol NoteTextViewDelegate: UITextViewDelegate {
     func didKeyboardShownOrHiden()
 }
 
-//extension UITextViewDelegate {
-//    func didKeyboardShownOrHiden()
-//}
-
 class NoteTextView: UITextView {
         
     static let contentInset = UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)

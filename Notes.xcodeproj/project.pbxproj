@@ -55,13 +55,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		CB0EB14A27AC3C5400C885AB /* NoteItem */ = {
+		CB0EB14A27AC3C5400C885AB /* CoreData */ = {
 			isa = PBXGroup;
 			children = (
+				CB0EB14B27AC520000C885AB /* CoreDataManager.swift */,
 				CB0EB14627AC3AE800C885AB /* Note+CoreDataClass.swift */,
 				CB0EB14727AC3AE800C885AB /* Note+CoreDataProperties.swift */,
 			);
-			path = NoteItem;
+			path = CoreData;
 			sourceTree = "<group>";
 		};
 		CB5FA94C27A71FF1007DA54B = {
@@ -83,7 +84,7 @@
 		CB5FA95727A71FF1007DA54B /* Notes */ = {
 			isa = PBXGroup;
 			children = (
-				CB0EB14A27AC3C5400C885AB /* NoteItem */,
+				CB0EB14A27AC3C5400C885AB /* CoreData */,
 				CB6CA4B827A9534F00788135 /* Extensions */,
 				CB6CA4AA27A8433500788135 /* NoteList */,
 				CB6CA4BD27A992C400788135 /* Note */,
@@ -129,7 +130,6 @@
 			children = (
 				CB6CA4C227A994ED00788135 /* NoteViewController.swift */,
 				CB6CA4C427A9B84600788135 /* NoteTextView.swift */,
-				CB0EB14B27AC520000C885AB /* CoreDataManager.swift */,
 			);
 			path = Note;
 			sourceTree = "<group>";
