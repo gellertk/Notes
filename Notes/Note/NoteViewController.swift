@@ -10,9 +10,15 @@ import CoreData
 
 class NoteViewController: UIViewController {
     
-    private let buttonsColor = UIColor.systemYellow
     private var note: Note?
     public weak var noteListViewControllerDelegate: NoteListViewControllerDelegate?
+    
+    private lazy var noteTextView: NoteTextView = {
+        let noteView = NoteTextView(note: note)
+        noteView.delegate = self
+        noteView.translatesAutoresizingMaskIntoConstraints = false
+        return noteView
+    }()
     
     init(note: Note? = nil) {
         self.note = note
@@ -22,14 +28,6 @@ class NoteViewController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    private lazy var noteTextView: NoteTextView = {
-        let noteView = NoteTextView(note: note)
-        noteView.noteViewControllerDelegate = self
-        noteView.delegate = self
-        noteView.translatesAutoresizingMaskIntoConstraints = false
-        return noteView
-    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -81,11 +79,7 @@ class NoteViewController: UIViewController {
         noteTextView.resignFirstResponder()
     }
     
-}
-
-extension NoteViewController: NoteTextViewDelegate {
-    
-    @objc func didKeyboardShownOrHiden() {
+    func didKeyboardShownOrHiden() {
         if navigationItem.rightBarButtonItem == nil {
             let doneButton = UIBarButtonItem(title: "Готово",
                                              style: .plain,
@@ -96,7 +90,7 @@ extension NoteViewController: NoteTextViewDelegate {
                 NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17, weight: .semibold)
             ], for: .normal)
             navigationItem.setRightBarButton(doneButton, animated: false)
-            navigationItem.rightBarButtonItem?.tintColor = buttonsColor
+            navigationItem.rightBarButtonItem?.tintColor = Constants.buttonsColor
         } else {
             navigationItem.rightBarButtonItem = nil
         }
@@ -107,6 +101,7 @@ extension NoteViewController: NoteTextViewDelegate {
 extension NoteViewController: UITextViewDelegate {
     
     func textViewDidEndEditing(_ textView: UITextView) {
+        didKeyboardShownOrHiden()
         note?.text = textView.text
         if note?.text.isEmpty ?? true {
             deleteNote()
@@ -114,5 +109,9 @@ extension NoteViewController: UITextViewDelegate {
             updateNote()
         }
     }
-        
+    
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        didKeyboardShownOrHiden()
+    }
+    
 }

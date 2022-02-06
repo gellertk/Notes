@@ -7,18 +7,10 @@
 
 import UIKit
 
-protocol NoteTextViewDelegate: UITextViewDelegate {
-    func didKeyboardShownOrHiden()
-}
-
 class NoteTextView: UITextView {
-        
-    static let contentInset = UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
-        
+    
     private let note: Note?
     private var isKeyboardShown = false
-        
-    public weak var noteViewControllerDelegate: NoteTextViewDelegate?
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -46,7 +38,7 @@ class NoteTextView: UITextView {
         font = UIFont.preferredFont(forTextStyle: .body)
         backgroundColor = .black
         textColor = .white
-        contentInset = NoteTextView.contentInset
+        contentInset = Constants.contentInset
         setupText()
     }
     
@@ -58,20 +50,14 @@ class NoteTextView: UITextView {
     }
     
     @objc private func didKeyboardShowOrHide(notification: Notification) {
-        guard let keyboardValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue,
-              let noteViewControllerDelegate = noteViewControllerDelegate else {
+        guard let keyboardValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else {
             return
         }
         let keyboardViewEndFrame = convert(keyboardValue.cgRectValue, to: window)
         if notification.name == UIResponder.keyboardWillHideNotification, isKeyboardShown {
-            noteViewControllerDelegate.didKeyboardShownOrHiden()
             isKeyboardShown = false
         } else if notification.name == UIResponder.keyboardWillShowNotification, !isKeyboardShown {
-            contentInset = UIEdgeInsets(top: 5,
-                                        left: 5,
-                                        bottom: keyboardViewEndFrame.height - safeAreaInsets.bottom,
-                                        right: 5)
-            noteViewControllerDelegate.didKeyboardShownOrHiden()
+            contentInset.bottom = keyboardViewEndFrame.height - safeAreaInsets.bottom
             isKeyboardShown = true
         }
     }

@@ -14,17 +14,14 @@ protocol NoteListViewControllerDelegate: AnyObject {
 
 class NoteListViewController: UIViewController {
     
-    private static let noteTitle = "Заметки"
-    
-    private let buttonsColor = UIColor.systemYellow
-    
     private var noteList: [Note] = []
     
     private lazy var searchController: UISearchController = {
         let searchController = UISearchController()
-        searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchBar.delegate = self
         searchController.delegate = self
+        searchController.searchBar.placeholder = "Поиск"
+        searchController.searchBar.searchTextField.backgroundColor = .clear
         return searchController
     }()
     
@@ -33,9 +30,10 @@ class NoteListViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.layer.cornerRadius = 10
-        tableView.register(NoteListTableViewCell.self, forCellReuseIdentifier: NoteListTableViewCell.cellId)
+        tableView.register(NoteListTableViewCell.self, forCellReuseIdentifier: Constants.cellId)
         tableView.separatorStyle = .none
         tableView.backgroundColor = .black.withAlphaComponent(0.1)
+        tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
     }()
     
@@ -48,23 +46,16 @@ class NoteListViewController: UIViewController {
     private func fillNotes() {
         if UserDefaults.isFirstLaunch() {
             let welcomeNote = createNote()
-            welcomeNote.text = """
-            Добро пожаловать
-            Первая заметка
-            """
+            welcomeNote.text = Constants.firstNoteText
         } else {
             noteList = CoreDataManager.shared.getNotes()
         }
     }
     
     private func setupView() {
-        setupNavigationBar()
-        navigationItem.searchController = searchController
         view.backgroundColor = .black
-        [noteListTableView].forEach { newView in
-            newView.translatesAutoresizingMaskIntoConstraints = false
-            view.addSubview(newView)
-        }
+        view.addSubview(noteListTableView)
+        setupNavigationBar()
         setupConstraints()
     }
     
@@ -72,10 +63,12 @@ class NoteListViewController: UIViewController {
         guard let navigationController = navigationController else {
             return
         }
-        title = NoteListViewController.noteTitle
+        title = Constants.noteTitle
+        navigationItem.searchController = searchController
+        navigationController.navigationBar.clipsToBounds = true
         navigationController.navigationBar.barStyle = .black
         navigationController.navigationBar.prefersLargeTitles = true
-        navigationController.navigationBar.tintColor = buttonsColor
+        navigationController.navigationBar.tintColor = Constants.buttonsColor
         navigationController.navigationBar.isTranslucent = false
         navigationItem.setRightBarButton(UIBarButtonItem(image: UIImage(systemName: "plus"),
                                                          style: .plain,
@@ -117,10 +110,6 @@ class NoteListViewController: UIViewController {
         return IndexPath(row: row, section: 0)
     }
     
-    @objc public func reloadTable() {
-        noteListTableView.reloadData()
-    }
-    
 }
 
 extension NoteListViewController: UITableViewDelegate, UITableViewDataSource {
@@ -130,7 +119,7 @@ extension NoteListViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: NoteListTableViewCell.cellId,
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: Constants.cellId,
                                                        for: indexPath) as? NoteListTableViewCell else {
             return UITableViewCell()
         }
@@ -157,6 +146,11 @@ extension NoteListViewController: UITableViewDelegate, UITableViewDataSource {
         }
     }
     
+    func search(_ text: String?) {
+        noteList = CoreDataManager.shared.getNotes(filter: text)
+        noteListTableView.reloadData()
+    }
+    
 }
 
 extension NoteListViewController: NoteListViewControllerDelegate {
@@ -170,11 +164,6 @@ extension NoteListViewController: NoteListViewControllerDelegate {
     
     func refreshNoteList() {
         noteList = noteList.sorted { $0.lastUpdated > $1.lastUpdated }
-        noteListTableView.reloadData()
-    }
-    
-    func search(_ text: String?) {
-        noteList = CoreDataManager.shared.getNotes(filter: text)
         noteListTableView.reloadData()
     }
     

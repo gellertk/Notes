@@ -8,9 +8,7 @@
 import UIKit
 
 class NoteListTableViewCell: UITableViewCell {
-    
-    public static let cellId = "cellId"
-    
+        
     private lazy var titleCellLabel: UILabel = {
         let label = UILabel()
         label.textColor = .white
@@ -100,6 +98,7 @@ class NoteListTableViewCell: UITableViewCell {
                 .layerMinXMaxYCorner,
                 .layerMaxXMaxYCorner
             ]
+            separatorLineView.isHidden = false
         } else {
             layer.cornerRadius = 0
             separatorLineView.isHidden = false
