@@ -39,15 +39,10 @@ class NoteViewController: UIViewController {
         if noteTextView.text.isEmpty {
             noteTextView.becomeFirstResponder()
         }
-        navigationController?.navigationBar.prefersLargeTitles = false
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        navigationController?.navigationBar.prefersLargeTitles = true
     }
     
     private func setupView() {
+        navigationItem.largeTitleDisplayMode = .never
         view.backgroundColor = .blue
         view.addSubview(noteTextView)
         setupConstraints()

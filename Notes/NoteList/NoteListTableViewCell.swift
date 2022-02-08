@@ -40,6 +40,7 @@ class NoteListTableViewCell: UITableViewCell {
     }
     
     private func setupView() {
+        contentView.layer.masksToBounds = true
         backgroundColor = UIColor(white: 0.1, alpha: 1)
         [titleCellLabel, textCellLabel, separatorLineView].forEach { view in
             view.translatesAutoresizingMaskIntoConstraints = false
