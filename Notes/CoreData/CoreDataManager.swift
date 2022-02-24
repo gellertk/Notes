@@ -22,7 +22,7 @@ class CoreDataManager {
     }
     
     func load() {
-        persistentContainer.loadPersistentStores { descriptiom, error in
+        persistentContainer.loadPersistentStores { _ , error in
             if let error = error {
                 fatalError(error.localizedDescription)
             }

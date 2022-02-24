@@ -44,7 +44,7 @@ class NoteListTableViewCell: UITableViewCell {
         backgroundColor = UIColor(white: 0.1, alpha: 1)
         [titleCellLabel, textCellLabel, separatorLineView].forEach { view in
             view.translatesAutoresizingMaskIntoConstraints = false
-            addSubview(view)
+            contentView.addSubview(view)
         }
         setupConstraints()
     }
