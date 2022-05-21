@@ -43,9 +43,9 @@ class NoteViewController: UIViewController {
     
     private func setupView() {
         navigationItem.largeTitleDisplayMode = .never
-        view.backgroundColor = .blue
         view.addSubview(noteTextView)
         setupConstraints()
+        setupToolbar()
     }
     
     private func setupConstraints() {
@@ -85,9 +85,33 @@ class NoteViewController: UIViewController {
                 NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17, weight: .semibold)
             ], for: .normal)
             navigationItem.setRightBarButton(doneButton, animated: false)
-            navigationItem.rightBarButtonItem?.tintColor = Constants.buttonsColor
+            navigationItem.rightBarButtonItem?.tintColor = K.Color.buttonTint
         } else {
             navigationItem.rightBarButtonItem = nil
+        }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.toolbar.isTranslucent = false
+    }
+    
+    private func setupToolbar() {
+        navigationController?.toolbar.barTintColor = .black
+        navigationController?.toolbar.tintColor = K.Color.buttonTint
+
+        navigationController?.isToolbarHidden = false
+        toolbarItems = [UIBarButtonItem]()
+        
+        let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
+        for (index, imageTitle) in K.Collection.noteToolbarImages.enumerated() {
+            toolbarItems?.append(UIBarButtonItem(image: UIImage(systemName: imageTitle),
+                                                 style: .plain,
+                                                 target: self,
+                                                 action: nil))
+            if index != K.Collection.noteToolbarImages.count - 1 {
+                toolbarItems?.append(flexibleSpace)
+            }
         }
     }
     

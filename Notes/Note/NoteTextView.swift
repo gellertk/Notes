@@ -18,7 +18,7 @@ class NoteTextView: UITextView {
     
     init(note: Note?) {
         self.note = note
-        super.init(frame: CGRect.zero, textContainer: nil)
+        super.init(frame: .zero, textContainer: nil)
         setupView()
         addObservers()
     }
@@ -35,10 +35,10 @@ class NoteTextView: UITextView {
     }
     
     private func setupView() {
-        font = UIFont.preferredFont(forTextStyle: .body)
+        font = .preferredFont(forTextStyle: .body)
         backgroundColor = .black
         textColor = .white
-        contentInset = Constants.contentInset
+        textContainerInset = UIEdgeInsets(top: 5, left: 25, bottom: 5, right: 5)
         setupText()
     }
     

@@ -14,7 +14,13 @@ protocol NoteListViewControllerDelegate: AnyObject {
 
 class NoteListViewController: UIViewController {
     
-    private var noteList: [Note] = []
+    private var noteList: [Note] = [] {
+        didSet {
+            if let label = notesCountLabel.customView as? UILabel {
+                label.text = "\(noteList.count) \(noteList.count.inclineEnding())"
+            }
+        }
+    }
     
     private lazy var searchController: UISearchController = {
         let searchController = UISearchController()
@@ -22,19 +28,29 @@ class NoteListViewController: UIViewController {
         searchController.delegate = self
         searchController.searchBar.placeholder = "Поиск"
         searchController.searchBar.searchTextField.backgroundColor = .clear
+        
         return searchController
     }()
     
     private lazy var noteListTableView: UITableView = {
-        let tableView = UITableView()
+        let tableView = UITableView(frame: .zero, style: .insetGrouped)
         tableView.delegate = self
         tableView.dataSource = self
-        tableView.layer.cornerRadius = 10
-        tableView.register(NoteListTableViewCell.self, forCellReuseIdentifier: Constants.cellId)
-        tableView.separatorStyle = .none
+        tableView.register(NoteListTableViewCell.self, forCellReuseIdentifier: NoteListTableViewCell.reuseId)
+        tableView.separatorColor = .white.withAlphaComponent(0.15)
         tableView.backgroundColor = .black.withAlphaComponent(0.1)
         tableView.translatesAutoresizingMaskIntoConstraints = false
+        
         return tableView
+    }()
+    
+    private let notesCountLabel: UIBarButtonItem = {
+        let label = UILabel()
+        label.adjustsFontSizeToFitWidth = true
+        label.font = .preferredFont(forTextStyle: .footnote)
+        label.textColor = .white
+        
+        return UIBarButtonItem(customView: label)
     }()
     
     override func viewDidLoad() {
@@ -46,7 +62,7 @@ class NoteListViewController: UIViewController {
     private func fillNotes() {
         if UserDefaults.isFirstLaunch() {
             let welcomeNote = createNote()
-            welcomeNote.text = Constants.firstNoteText
+            welcomeNote.text = K.String.firstNoteText
         } else {
             noteList = CoreDataManager.shared.getNotes()
         }
@@ -56,6 +72,7 @@ class NoteListViewController: UIViewController {
         view.backgroundColor = .black
         view.addSubview(noteListTableView)
         setupNavigationBar()
+        setupToolbar()
         setupConstraints()
     }
     
@@ -63,17 +80,15 @@ class NoteListViewController: UIViewController {
         guard let navigationController = navigationController else {
             return
         }
-        title = Constants.noteTitle
+        title = K.String.noteTitle
         navigationItem.searchController = searchController
-        navigationController.navigationBar.clipsToBounds = true
         navigationController.navigationBar.barStyle = .black
         navigationController.navigationBar.prefersLargeTitles = true
-        navigationController.navigationBar.tintColor = Constants.buttonsColor
-        navigationController.navigationBar.isTranslucent = false
-        navigationItem.setRightBarButton(UIBarButtonItem(image: UIImage(systemName: "plus"),
+        navigationController.navigationBar.tintColor = K.Color.buttonTint
+        navigationItem.setRightBarButton(UIBarButtonItem(image: UIImage(systemName: "ellipsis.circle"),
                                                          style: .plain,
                                                          target: self,
-                                                         action: #selector(didTapAddButton)), animated: false)
+                                                         action: nil), animated: false)
     }
     
     @objc private func didTapAddButton() {
@@ -84,6 +99,7 @@ class NoteListViewController: UIViewController {
         let note = CoreDataManager.shared.createNote()
         noteList.insert(note, at: 0)
         noteListTableView.insertRows(at: [IndexPath(row: 0, section: 0)], with: .automatic)
+        
         return note
     }
     
@@ -100,14 +116,34 @@ class NoteListViewController: UIViewController {
         NSLayoutConstraint.activate([
             noteListTableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             noteListTableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            noteListTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 15),
-            noteListTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -15)
+            noteListTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: -5),
+            noteListTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 5)
         ])
     }
     
     private func indexForNote(note: Note, in list: [Note]) -> IndexPath {
         let row = Int(list.firstIndex(where: { $0 == note }) ?? 0)
+        
         return IndexPath(row: row, section: 0)
+    }
+    
+    private func setupToolbar() {
+        navigationController?.toolbar.barTintColor = .black
+        navigationController?.toolbar.tintColor = K.Color.buttonTint
+
+        navigationController?.isToolbarHidden = false
+        let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
+        
+        let addButton = UIBarButtonItem(image: UIImage(systemName: "square.and.pencil"),
+                                        style: .plain,
+                                        target: self,
+                                        action: #selector(didTapAddButton))
+        toolbarItems = [flexibleSpace, notesCountLabel, flexibleSpace, addButton]
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.toolbar.isTranslucent = true
     }
     
 }
@@ -119,18 +155,18 @@ extension NoteListViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: Constants.cellId,
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: NoteListTableViewCell.reuseId,
                                                        for: indexPath) as? NoteListTableViewCell else {
             return UITableViewCell()
         }
-        cell.setup(noteList[indexPath.row],
-                   isFirst: indexPath.row == 0,
-                   isLast: indexPath.row == (noteList.count - 1))
+        
+        cell.configure(with: noteList[indexPath.row])
+
         return cell
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 75
+        return 60
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -150,7 +186,7 @@ extension NoteListViewController: UITableViewDelegate, UITableViewDataSource {
         noteList = CoreDataManager.shared.getNotes(filter: text)
         noteListTableView.reloadData()
     }
-    
+        
 }
 
 extension NoteListViewController: NoteListViewControllerDelegate {
